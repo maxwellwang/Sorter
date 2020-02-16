@@ -20,6 +20,7 @@ int quickSort(void* toSort, int (*comparator)(void*, void*)) {
 }
 
 int main(int argc, char* argv[]) {
+	char c = '?';
 	//int (*compPtr)(void*, void*) = comparator;
 	
 	// handle input errors
@@ -43,7 +44,13 @@ int main(int argc, char* argv[]) {
 	}
 	
 	// read from file
-	
+	int bytesRead = read(fd, &c, 1);
+	if (bytesRead == 0) {
+		printf("Warning: File is empty\n");
+	}
+	while (read(fd, &c, 1) > 0) {
+		printf("%c\n", c);
+	}
 	
 	int status = close(fd);
 	if (status == -1) {
