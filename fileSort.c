@@ -20,28 +20,12 @@ int quickSort(void* toSort, int (*comparator)(void*, void*)) {
 	return 0;
 }
 
-int main(int argc, char* argv[]) {
-	// buffer for reading one char at a time
-	char c = '?';
-	// buffer for elements
-	char* buffer = malloc(1);
-	if (buffer == NULL) {
-		printf("Malloc failed\n");
-		return 0;
-	}
-	// updated buffer which can hold one more char than previous buffer
-	char* nextBuffer;
-	int elementFound = 0;
-	int fileEmpty = 1;
-	int status = 0;
-	// int (*compPtr)(void*, void*) = comparator;
-	
+int main(int argc, char* argv[]) {	
 	// handle input errors
 	if (argc != 3) {
 		printf("Fatal Error: Expected 2 arguments, had %d\n", argc - 1);
 		return 0;
 	}
-	
 	if (argv[1][0] != '-' || (argv[1][1] != 'i' && argv[1][1] != 'q') || argv[1][2] != '\0') {
 		printf("Fatal Error: \"%s\" is not a valid sort flag, enter \"-i\" for insertion sort or \"-q\" for quicksort\n", argv[1]);
 		return 0;
@@ -56,38 +40,54 @@ int main(int argc, char* argv[]) {
 		printf("File Path: %s\n", argv[2]);
 	}
 	
+	// holds the current char that was read
+	char c = '?';
+	// buffer for elements
+	char* buffer = malloc(1);
+	if (!buffer) {
+		printf("Malloc failed\n");
+		return 0;
+	}
+	// where to insert into buffer
+	char* head = buffer;
+	// updated buffer which can hold one more char than previous buffer
+	char* nextBuffer;
+	// int (*compPtr)(void*, void*) = comparator;
+
+	
 	// read from file
+	int elementFound = 0;
+	int fileEmpty = 1;
+	int written = 0;
 	while (read(fd, &c, 1) > 0) {
 		if (fileEmpty) {
 			fileEmpty = 0;
 		}
-		
-		// assign type when integer/string is found, and create appropriate buffer
-		if (elementFound == 0 && isalpha(c)) {
-			elementFound = 1;
-		} else if (elementFound == 0 && isdigit(c)) {
+		if (elementFound == 0 && (isalpha(c) || isdigit(c))) {
 			elementFound = 1;
 		}
-		
 		if (isalpha(c) || isdigit(c) || c == ',') {
-			// realloc to allow one more char
-			if (DEBUG) {
-				printf("Size of buffer: %d\n", strlen(buffer));
+			if (head == (buffer + strlen(buffer))) {
+				// realloc to allow one more char
+				if (DEBUG) {
+					printf("Size of buffer: %zu\n", strlen(buffer));
+				}
+				nextBuffer = malloc(strlen(buffer) + 1);
+				if (!nextBuffer) {
+					printf("Malloc failed\n");
+					return 0;
+				}
+				memcpy(nextBuffer, buffer, strlen(buffer));
+				free(buffer);
+				buffer = nextBuffer;
+				nextBuffer = NULL;		
 			}
-			nextBuffer = malloc(strlen(buffer) + 1);
-			if (nextBuffer == NULL) {
-				printf("Malloc failed\n");
-				return 0;
-			}
-			memcpy(nextBuffer, buffer, strlen(buffer));
-			free(buffer);
-			buffer = nextBuffer;
-			nextBuffer = NULL;
 			
-			sprintf(buffer + strlen(buffer) - 1, "%c", c);
+			written += sprintf(head, "%c", c);
 			if (DEBUG) {
-				printf("Printed %c at position %d\n", c, strlen(buffer) - 1);
+				printf("Wrote %c\n", c);
 			}
+			head = buffer + written;
 		}
 	}
 	if (fileEmpty) {
@@ -104,11 +104,12 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	
-	status = close(fd);
+	int status = close(fd);
 	if (status == -1) {
 		perror("Error");
 	}
 	
 	free(buffer);
+	free(nextBuffer);
 	return 0;
 }
