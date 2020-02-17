@@ -72,21 +72,21 @@ int main(int argc, char* argv[]) {
 		if (isalpha(c) || isdigit(c) || c == ',') {
 			// realloc to allow one more char
 			if (DEBUG) {
-				printf("Size of buffer: %d\n", (int)(sizeof(buffer)));
+				printf("Size of buffer: %d\n", strlen(buffer));
 			}
-			nextBuffer = malloc(sizeof(buffer) + 1);
+			nextBuffer = malloc(strlen(buffer) + 1);
 			if (nextBuffer == NULL) {
 				printf("Malloc failed\n");
 				return 0;
 			}
-			memcpy(nextBuffer, buffer, sizeof(buffer) + 0);
+			memcpy(nextBuffer, buffer, strlen(buffer));
 			free(buffer);
 			buffer = nextBuffer;
 			nextBuffer = NULL;
 			
-			sprintf(buffer + sizeof(buffer) - 1, "%c", c);
+			sprintf(buffer + strlen(buffer) - 1, "%c", c);
 			if (DEBUG) {
-				printf("Printed %c at position %d\n", c, (int)(sizeof(buffer) - 1));
+				printf("Printed %c at position %d\n", c, strlen(buffer) - 1);
 			}
 		}
 	}
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 	
 	if (DEBUG) {
 		int i;
-		for (i = 0; i < sizeof(buffer); i++) {
+		for (i = 0; i < strlen(buffer); i++) {
 			printf("%c", buffer[i]);
 		}
 	}
