@@ -18,9 +18,9 @@ void printLL(Node* front) {
 	Node* ptr = front;
 	while (ptr != NULL) {
 		if (isdigit(ptr->data)) {
-			printf("%d\n", ptr->data);
+			printf("%d\n", *((int*)(ptr->data)));
 		} else {
-			printf("%c\n", ptr->data);
+			printf("%c\n", *((char*)(ptr->data)));
 		}
 		ptr = ptr->next;
 	}
