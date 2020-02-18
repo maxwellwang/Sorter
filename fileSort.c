@@ -8,6 +8,22 @@
 #include <string.h>
 #define DEBUG 1
 
+typedef struct Node {
+	int data;
+	struct Node* next;
+} Node;
+		
+// prints size and LL contents
+void printLL(Node* front, int size) {
+	printf("%d :", size);	
+	Node* ptr = front;
+	while (ptr != NULL) {
+		printf(" %d", ptr->data);
+		ptr = ptr->next;
+	}
+	printf("\n");
+}
+
 int comparator(void* a, void* b) {
 	return 0;
 }
@@ -42,23 +58,14 @@ int main(int argc, char* argv[]) {
 	
 	// holds the current char that was read
 	char c = '?';
-	// buffer for elements
-	char* buffer = malloc(1);
-	if (!buffer) {
-		printf("Malloc failed\n");
-		return 0;
-	}
-	// where to insert into buffer
-	char* head = buffer;
-	// updated buffer which can hold one more char than previous buffer
-	char* nextBuffer;
+	// front of LL
+	Node* front = NULL;
 	// int (*compPtr)(void*, void*) = comparator;
 
 	
 	// read from file
 	int elementFound = 0;
 	int fileEmpty = 1;
-	int written = 0;
 	while (read(fd, &c, 1) > 0) {
 		if (fileEmpty) {
 			fileEmpty = 0;
@@ -67,27 +74,7 @@ int main(int argc, char* argv[]) {
 			elementFound = 1;
 		}
 		if (isalpha(c) || isdigit(c) || c == ',') {
-			if (head == (buffer + strlen(buffer))) {
-				// realloc to allow one more char
-				if (DEBUG) {
-					printf("Size of buffer: %zu\n", strlen(buffer));
-				}
-				nextBuffer = malloc(strlen(buffer) + 1);
-				if (!nextBuffer) {
-					printf("Malloc failed\n");
-					return 0;
-				}
-				memcpy(nextBuffer, buffer, strlen(buffer));
-				free(buffer);
-				buffer = nextBuffer;
-				nextBuffer = NULL;		
-			}
-			
-			written += sprintf(head, "%c", c);
-			if (DEBUG) {
-				printf("Wrote %c\n", c);
-			}
-			head = buffer + written;
+			// add to LL
 		}
 	}
 	if (fileEmpty) {
@@ -97,19 +84,11 @@ int main(int argc, char* argv[]) {
 		printf("Warning: No integers/strings found in file\n");
 	}
 	
-	if (DEBUG) {
-		int i;
-		for (i = 0; i < strlen(buffer); i++) {
-			printf("%c", buffer[i]);
-		}
-	}
-	
 	int status = close(fd);
 	if (status == -1) {
 		perror("Error");
 	}
 	
-	free(buffer);
-	free(nextBuffer);
+	free(front);
 	return 0;
 }
