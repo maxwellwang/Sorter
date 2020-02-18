@@ -9,19 +9,21 @@
 #define DEBUG 1
 
 typedef struct Node {
-	int data;
+	void* data;
 	struct Node* next;
 } Node;
 		
-// prints size and LL contents
-void printLL(Node* front, int size) {
-	printf("%d :", size);	
+// prints LL contents
+void printLL(Node* front) {
 	Node* ptr = front;
 	while (ptr != NULL) {
-		printf(" %d", ptr->data);
+		if (isdigit(ptr->data)) {
+			printf("%d\n", ptr->data);
+		} else {
+			printf("%c\n", ptr->data);
+		}
 		ptr = ptr->next;
 	}
-	printf("\n");
 }
 
 int comparator(void* a, void* b) {
