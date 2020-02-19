@@ -94,9 +94,9 @@ int main() {
   Node c = {3, &b};
   Node * tmp = &c;
   quickSort(&tmp);
-  Node * ptr = tmp;
-  for (; ptr != NULL; ptr = ptr->next) {
+  Node * ptr;
+  for (ptr = tmp; ptr != NULL; ptr = ptr->next) {
     printf("%d ", ptr->value);
   }
-  return 1;
+  return 0;
 }

@@ -124,12 +124,10 @@ int main(int argc, char* argv[]) {
 	
 	
 	// read from file and make LL
-	int tokenFound = 0;
 	int newToken = 0;
 	while (read(fd, &c, 1) > 0) {
 		if (isalpha(c) || isdigit(c)) {
 			// add to buffer and increment written
-			tokenFound = 1;
 			if (written == 0) {
 				newToken = 1;
 			}
@@ -170,11 +168,8 @@ int main(int argc, char* argv[]) {
 	}
 	
 	// handle file content warnings
-	if (strlen(buffer) == 0) {
+	if (c == '\n' && front == NULL) {
 		printf("Warning: File is empty\n");
-	}
-	if (!tokenFound) {
-		printf("Warning: File does not contain strings nor integers\n");
 	}
 	
 	// call sorts here
