@@ -6,8 +6,9 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
-#define DEBUG 1
+#define DEBUG 0
 
+// Node has strings containing token and pointer to next Node
 typedef struct Node {
 	char* data;
 	struct Node* next;
@@ -22,7 +23,7 @@ void printLL(Node* front) {
 	}
 }
 
-// insert node, insert "tokenLength" chars from "data" into LL
+// insert 'tokenLength' chars from 'data' into node and insert node into LL
 void insert(Node** frontPtr, char* data, int tokenLength) {
 	int j;
 	if (*frontPtr == NULL) {
@@ -55,7 +56,7 @@ void insert(Node** frontPtr, char* data, int tokenLength) {
 	}
 }
 
-// delete front
+// delete front and free allocated memory
 void delete(Node** frontPtr) {
 	if (*(frontPtr) == NULL) {
 		return;
@@ -101,7 +102,7 @@ int main(int argc, char* argv[]) {
 	
 	// buffer to hold each token, doubles every time limit is reached
 	char* buffer = malloc(10);
-	if (!buffer) {
+	if (buffer == NULL) {
 		perror("Error");
 	}
 	// current size of buffer
@@ -118,7 +119,8 @@ int main(int argc, char* argv[]) {
 	char* nextBuffer;
 	// front of LL
 	Node* front = NULL;
-	// int (*compPtr)(void*, void*) = comparator;
+	// function pointer to be used in sort call
+	int (*compPtr)(void*, void*) = comparator;
 	
 	
 	// read from file and make LL
@@ -161,6 +163,12 @@ int main(int argc, char* argv[]) {
 		insert(&front, buffer, tokenLength);
 	}
 	
+	// close file
+	int status = close(fd);
+	if (status == -1) {
+		perror("Error");
+	}
+	
 	// handle file content warnings
 	if (strlen(buffer) == 0) {
 		printf("Warning: File is empty\n");
@@ -169,14 +177,12 @@ int main(int argc, char* argv[]) {
 		printf("Warning: File does not contain strings nor integers\n");
 	}
 	
-	// close file
-	int status = close(fd);
-	if (status == -1) {
-		perror("Error");
-	}
-	
 	// call sorts here
-	
+	if (argv[1][1] == 'i') {
+		insertionSort(&front, compPtr);
+	} else if (argv[1][1] == 'q') {
+		quickSort(&front, compPtr);
+	}
 	
 	// print sorted LL
 	printLL(front);
