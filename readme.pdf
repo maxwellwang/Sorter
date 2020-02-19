@@ -2,8 +2,11 @@ a document meant for a user detailing how your code operates and how to use it -
 NAME
 	fileSort
 
-SYNOPSIS
+HOW TO CALL
 	./fileSort <sort flag> <file path>
 
 DESCRIPTION
-	The fileSort program reads in tokens from the file at 'file path', sorts it using the sort specified by "sort flag", and prints the resulting sorted output. Tokens will either be strings of lowercase letters or integers. Sort flag can be '-i' for insertion sort or '-q' for quicksort.
+	The fileSort program reads in tokens from the file at 'file path', sorts it using the sort specified by "sort flag", and prints the resulting sorted output.
+	Sort flag can either be '-i' to use insertion sort or '-q' to use quicksort.
+	File path should contain a text file with tokens separated by commas. Tokens can either be strings of lowercase letters or integers, and not both.
+	Program works by reading from file and inserting tokens into a linked list. Linked list is then sorted using the requested sort. Sorted linked list is then printed to stdout.

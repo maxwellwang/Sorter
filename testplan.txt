@@ -1,1 +1,7 @@
 a document detailing how you tested your code - what tests did you do and, in a sentence (or two), what were you testing for
+TESTS
+	Input tests to make sure fatal errors occurred if input was invalid.
+	Changed 'somefile' contents to strings or integers with varying whitespace
+
+TESTING FOR
+	We tested for
