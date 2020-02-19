@@ -12,7 +12,7 @@ typedef struct Node {
 	char* data;
 	struct Node* next;
 } Node;
-		
+
 // prints LL contents
 void printLL(Node* front) {
 	Node* ptr = front;
@@ -22,30 +22,36 @@ void printLL(Node* front) {
 	}
 }
 
-// insert node
-void insert(Node** frontPtr, char* data) {
+// insert node, insert "elementSize" chars from "data" into LL
+void insert(Node** frontPtr, char* data, int elementSize) {
+	int j;
 	if (*frontPtr == NULL) {
 		*frontPtr = malloc(sizeof(Node));
 		if (!(*frontPtr)) {
 			perror("Error");
 		}
-		(*frontPtr)->data = malloc(strlen(data));
+		(*frontPtr)->data = malloc(elementSize);
 		if ((*frontPtr)->data == NULL) {
 			perror("Error");
 		}
-		(*frontPtr)->data = data;
+		for (j = 0; j < elementSize; j++) {
+			((*frontPtr)->data)[j] = data[j];
+		}
 		(*frontPtr)->next = NULL;
 	} else {
 		Node* temp = malloc(sizeof(Node));
 		if (temp == NULL) {
 			perror("Error");
 		}
-		temp->data = malloc(strlen(data));
+		temp->data = malloc(elementSize);
 		if (temp->data == NULL) {
 			perror("Error");
 		}
-		temp->data = data;
-		temp->next = NULL;
+		for (j = 0; j < elementSize; j++) {
+			(temp->data)[j] = data[j];
+		}
+		temp->next = *frontPtr;
+		*frontPtr = temp;
 	}
 }
 
@@ -54,7 +60,7 @@ void delete(Node** frontPtr) {
 	if (*(frontPtr) == NULL) {
 		return;
 	}
-	
+
 	Node* temp = *frontPtr;
 	free((*frontPtr)->data);
 	*frontPtr = (*frontPtr)->next;
@@ -68,12 +74,12 @@ int comparator(void* a, void* b) {
 int insertionSort(void* toSort, int (*comparator)(void*, void*)) {
 	return 0;
 }
-			
+
 int quickSort(void* toSort, int (*comparator)(void*, void*)) {
 	return 0;
 }
 
-int main(int argc, char* argv[]) {	
+int main(int argc, char* argv[]) {
 	// handle input errors and open file
 	if (argc != 3) {
 		printf("Fatal Error: Expected 2 arguments, had %d\n", argc - 1);
@@ -93,11 +99,17 @@ int main(int argc, char* argv[]) {
 		printf("File Path: %s\n", argv[2]);
 	}
 	
-	// buffer to hold file contents, doubles every time limit is reached
+	// buffer to hold each element, doubles every time limit is reached
 	char* buffer = malloc(10);
 	if (!buffer) {
 		perror("Error");
 	}
+	// current size of buffer
+	int size = 10;
+	// size of element being inserted (ignore anything after)
+	int elementSize = 0;
+	// temporary spot for current char
+	char c = '?';
 	// where to write new chars
 	char* head = buffer;
 	// "head" is "written" bytes after "buffer"
@@ -107,15 +119,28 @@ int main(int argc, char* argv[]) {
 	// front of LL
 	Node* front = NULL;
 	// int (*compPtr)(void*, void*) = comparator;
-
 	
-	// read from file into buffer
-	while (read(fd, head, 1) > 0) {
-		written++;
+	
+	// read from file and make LL
+	int elementFound = 0;
+	while (read(fd, &c, 1) > 0) {
+		if (isalpha(c) || isdigit(c)) {
+			// add to buffer and increment written
+			elementFound = 1;
+			*head = c;
+			written++;
+			elementSize++;
+		} else if (c == ',') {
+			// element complete, insert into LL
+			written = 0;
+			insert(&front, buffer, elementSize);
+			elementSize = 0;
+		}
 		
-		if (head == (buffer + strlen(buffer))) {
+		if (head + 1 == buffer + size) {
 			// reached end of buffer, realloc with double size
-			nextBuffer = malloc(2 * strlen(buffer));
+			nextBuffer = malloc(2 * size);
+			size *= 2;
 			if (nextBuffer == NULL) {
 				perror("Error");
 			}
@@ -126,12 +151,16 @@ int main(int argc, char* argv[]) {
 		
 		head = buffer + written;
 	}
+	if (c != ',') {
+		// insert one element
+		insert(&front, buffer, elementSize);
+	}
 	
 	// handle file content warnings
 	if (strlen(buffer) == 0) {
 		printf("Warning: File is empty\n");
 	}
-	if (!isalpha(buffer[0]) && !isdigit(buffer[0]) && buffer[0] != '-') {
+	if (!elementFound) {
 		printf("Warning: File does not contain strings nor integers\n");
 	}
 	
@@ -141,13 +170,10 @@ int main(int argc, char* argv[]) {
 		perror("Error");
 	}
 	
-	// make LL
-	if (DEBUG) {
-		int i;
-		for (i = 0; i < written; i++) {
-			printf("%c", buffer[i]);
-		} 
-	}
+	// call sorts here
+	
+	// print sorted LL
+	printLL(front);
 	
 	// free all malloced memory
 	free(buffer);
