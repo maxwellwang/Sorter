@@ -1,1 +1,9 @@
 a document meant for a user detailing how your code operates and how to use it - like the man pages
+NAME
+	fileSort
+
+SYNOPSIS
+	./fileSort <sort flag> <file path>
+
+DESCRIPTION
+	The fileSort program reads in tokens from the file at 'file path', sorts it using the sort specified by "sort flag", and prints the resulting sorted output. Tokens will either be strings of lowercase letters or integers. Sort flag can be '-i' for insertion sort or '-q' for quicksort.
