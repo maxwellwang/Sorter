@@ -187,7 +187,7 @@ int main(int argc, char* argv[]) {
 	// print sorted LL
 	printLL(front);
 	
-	// free all malloced memory
+	// free all allocated memory
 	free(buffer);
 	while (front != NULL) {
 		delete(&front);
