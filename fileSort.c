@@ -22,19 +22,19 @@ void printLL(Node* front) {
 	}
 }
 
-// insert node, insert "elementSize" chars from "data" into LL
-void insert(Node** frontPtr, char* data, int elementSize) {
+// insert node, insert "tokenLength" chars from "data" into LL
+void insert(Node** frontPtr, char* data, int tokenLength) {
 	int j;
 	if (*frontPtr == NULL) {
 		*frontPtr = malloc(sizeof(Node));
 		if (!(*frontPtr)) {
 			perror("Error");
 		}
-		(*frontPtr)->data = malloc(elementSize);
+		(*frontPtr)->data = malloc(tokenLength);
 		if ((*frontPtr)->data == NULL) {
 			perror("Error");
 		}
-		for (j = 0; j < elementSize; j++) {
+		for (j = 0; j < tokenLength; j++) {
 			((*frontPtr)->data)[j] = data[j];
 		}
 		(*frontPtr)->next = NULL;
@@ -43,11 +43,11 @@ void insert(Node** frontPtr, char* data, int elementSize) {
 		if (temp == NULL) {
 			perror("Error");
 		}
-		temp->data = malloc(elementSize);
+		temp->data = malloc(tokenLength);
 		if (temp->data == NULL) {
 			perror("Error");
 		}
-		for (j = 0; j < elementSize; j++) {
+		for (j = 0; j < tokenLength; j++) {
 			(temp->data)[j] = data[j];
 		}
 		temp->next = *frontPtr;
@@ -99,15 +99,15 @@ int main(int argc, char* argv[]) {
 		printf("File Path: %s\n", argv[2]);
 	}
 	
-	// buffer to hold each element, doubles every time limit is reached
+	// buffer to hold each token, doubles every time limit is reached
 	char* buffer = malloc(10);
 	if (!buffer) {
 		perror("Error");
 	}
 	// current size of buffer
 	int size = 10;
-	// size of element being inserted (ignore anything after)
-	int elementSize = 0;
+	// size of token being inserted (ignore anything after)
+	int tokenLength = 0;
 	// temporary spot for current char
 	char c = '?';
 	// where to write new chars
@@ -122,19 +122,24 @@ int main(int argc, char* argv[]) {
 	
 	
 	// read from file and make LL
-	int elementFound = 0;
+	int tokenFound = 0;
+	int newToken = 0;
 	while (read(fd, &c, 1) > 0) {
 		if (isalpha(c) || isdigit(c)) {
 			// add to buffer and increment written
-			elementFound = 1;
+			tokenFound = 1;
+			if (written == 0) {
+				newToken = 1;
+			}
 			*head = c;
 			written++;
-			elementSize++;
+			tokenLength++;
 		} else if (c == ',') {
-			// element complete, insert into LL
+			// token complete, insert into LL
 			written = 0;
-			insert(&front, buffer, elementSize);
-			elementSize = 0;
+			insert(&front, buffer, tokenLength);
+			tokenLength = 0;
+			newToken = 0;
 		}
 		
 		if (head + 1 == buffer + size) {
@@ -151,16 +156,16 @@ int main(int argc, char* argv[]) {
 		
 		head = buffer + written;
 	}
-	if (c != ',') {
-		// insert one element
-		insert(&front, buffer, elementSize);
+	if (newToken) {
+		// insert one more token
+		insert(&front, buffer, tokenLength);
 	}
 	
 	// handle file content warnings
 	if (strlen(buffer) == 0) {
 		printf("Warning: File is empty\n");
 	}
-	if (!elementFound) {
+	if (!tokenFound) {
 		printf("Warning: File does not contain strings nor integers\n");
 	}
 	
