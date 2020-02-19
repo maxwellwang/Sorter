@@ -1,4 +1,3 @@
-a document meant for a user detailing how your code operates and how to use it - like the man pages
 NAME
 	fileSort
 
@@ -9,4 +8,4 @@ DESCRIPTION
 	The fileSort program reads in tokens from the file at 'file path', sorts it using the sort specified by "sort flag", and prints the resulting sorted output.
 	Sort flag can either be '-i' to use insertion sort or '-q' to use quicksort.
 	File path should contain a text file with tokens separated by commas. Tokens can either be strings of lowercase letters or integers, and not both.
-	Program works by reading from file and inserting tokens into a linked list. Linked list is then sorted using the requested sort. Sorted linked list is then printed to stdout.
+	Program works by reading from file and inserting tokens into a linked list. A buffer holds the token data and reallocates to double in size if more space is needed. Linked list is then sorted using the requested sort. Sorted linked list is then printed to stdout.
