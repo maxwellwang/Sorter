@@ -9,7 +9,7 @@
 #define DEBUG 1
 
 typedef struct Node {
-	void* data;
+	char* data;
 	struct Node* next;
 } Node;
 		
@@ -17,13 +17,48 @@ typedef struct Node {
 void printLL(Node* front) {
 	Node* ptr = front;
 	while (ptr != NULL) {
-		if (isdigit(ptr->data)) {
-			printf("%d\n", *((int*)(ptr->data)));
-		} else {
-			printf("%c\n", *((char*)(ptr->data)));
-		}
+		printf("%s\n", ptr->data);
 		ptr = ptr->next;
 	}
+}
+
+// insert node
+void insert(Node** frontPtr, char* data) {
+	if (*frontPtr == NULL) {
+		*frontPtr = malloc(sizeof(Node));
+		if (!(*frontPtr)) {
+			perror("Error");
+		}
+		(*frontPtr)->data = malloc(strlen(data));
+		if ((*frontPtr)->data == NULL) {
+			perror("Error");
+		}
+		(*frontPtr)->data = data;
+		(*frontPtr)->next = NULL;
+	} else {
+		Node* temp = malloc(sizeof(Node));
+		if (temp == NULL) {
+			perror("Error");
+		}
+		temp->data = malloc(strlen(data));
+		if (temp->data == NULL) {
+			perror("Error");
+		}
+		temp->data = data;
+		temp->next = NULL;
+	}
+}
+
+// delete front
+void delete(Node** frontPtr) {
+	if (*(frontPtr) == NULL) {
+		return;
+	}
+	
+	Node* temp = *frontPtr;
+	free((*frontPtr)->data);
+	*frontPtr = (*frontPtr)->next;
+	free(temp);
 }
 
 int comparator(void* a, void* b) {
@@ -39,58 +74,86 @@ int quickSort(void* toSort, int (*comparator)(void*, void*)) {
 }
 
 int main(int argc, char* argv[]) {	
-	// handle input errors
+	// handle input errors and open file
 	if (argc != 3) {
 		printf("Fatal Error: Expected 2 arguments, had %d\n", argc - 1);
-		return 0;
+		exit(0);
 	}
 	if (argv[1][0] != '-' || (argv[1][1] != 'i' && argv[1][1] != 'q') || argv[1][2] != '\0') {
 		printf("Fatal Error: \"%s\" is not a valid sort flag, enter \"-i\" for insertion sort or \"-q\" for quicksort\n", argv[1]);
-		return 0;
+		exit(0);
 	}
 	int fd = open(argv[2], O_RDONLY);
 	if (fd == -1) {
 		perror("Fatal Error");
-		return 0;
+		exit(0);
 	}
 	if (DEBUG) {
 		printf("Flag: %s\n", argv[1]);
 		printf("File Path: %s\n", argv[2]);
 	}
 	
-	// holds the current char that was read
-	char c = '?';
+	// buffer to hold file contents, doubles every time limit is reached
+	char* buffer = malloc(10);
+	if (!buffer) {
+		perror("Error");
+	}
+	// where to write new chars
+	char* head = buffer;
+	// "head" is "written" bytes after "buffer"
+	int written = 0;
+	// reallocated buffer with double size
+	char* nextBuffer;
 	// front of LL
 	Node* front = NULL;
 	// int (*compPtr)(void*, void*) = comparator;
 
 	
-	// read from file
-	int elementFound = 0;
-	int fileEmpty = 1;
-	while (read(fd, &c, 1) > 0) {
-		if (fileEmpty) {
-			fileEmpty = 0;
+	// read from file into buffer
+	while (read(fd, head, 1) > 0) {
+		written++;
+		
+		if (head == (buffer + strlen(buffer))) {
+			// reached end of buffer, realloc with double size
+			nextBuffer = malloc(2 * strlen(buffer));
+			if (nextBuffer == NULL) {
+				perror("Error");
+			}
+			memcpy(nextBuffer, buffer, strlen(buffer));
+			free(buffer);
+			buffer = nextBuffer;
 		}
-		if (elementFound == 0 && (isalpha(c) || isdigit(c))) {
-			elementFound = 1;
-		}
-		if (isalpha(c) || isdigit(c) || c == ',') {
-			// add to LL
-		}
-	}
-	if (fileEmpty) {
-		printf("Warning: File is empty\n");
-	}
-	if (!elementFound) {
-		printf("Warning: No integers/strings found in file\n");
+		
+		head = buffer + written;
 	}
 	
+	// handle file content warnings
+	if (strlen(buffer) == 0) {
+		printf("Warning: File is empty\n");
+	}
+	if (!isalpha(buffer[0]) && !isdigit(buffer[0]) && buffer[0] != '-') {
+		printf("Warning: File does not contain strings nor integers\n");
+	}
+	
+	// close file
 	int status = close(fd);
 	if (status == -1) {
 		perror("Error");
 	}
 	
-	free(front);
+	// make LL
+	if (DEBUG) {
+		int i;
+		for (i = 0; i < written; i++) {
+			printf("%c", buffer[i]);
+		} 
+	}
+	
+	// free all malloced memory
+	free(buffer);
+	while (front != NULL) {
+		delete(&front);
+	}
+	
 	return 0;
 }
