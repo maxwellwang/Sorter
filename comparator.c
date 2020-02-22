@@ -73,6 +73,7 @@ int quickSort(Node ** head) {
   return 1;
 }
 
+
 int main(int argc, char * argv[]) {
   Node a = {8, NULL};
   Node b = {1, &a};
@@ -87,5 +88,5 @@ int main(int argc, char * argv[]) {
     Node * ptr = tmp;
     print(tmp);
   }
-  return 1;
+  return 0;
 }
