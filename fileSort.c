@@ -21,6 +21,7 @@ void printLL(Node* front) {
 		printf("%s\n", ptr->data);
 		ptr = ptr->next;
 	}
+	return;
 }
 
 // insert 'tokenLength' chars from 'data' into node and insert node into LL
@@ -54,18 +55,18 @@ void insert(Node** frontPtr, char* data, int tokenLength) {
 		temp->next = *frontPtr;
 		*frontPtr = temp;
 	}
+	return;
 }
 
 // delete front and free allocated memory
 void delete(Node** frontPtr) {
-	if (*(frontPtr) == NULL) {
-		return;
+	if (*(frontPtr) != NULL) {
+		Node* temp = *frontPtr;
+		free((*frontPtr)->data);
+		*frontPtr = (*frontPtr)->next;
+		free(temp);
 	}
-
-	Node* temp = *frontPtr;
-	free((*frontPtr)->data);
-	*frontPtr = (*frontPtr)->next;
-	free(temp);
+	return;
 }
 
 int comparator(void* a, void* b) {
