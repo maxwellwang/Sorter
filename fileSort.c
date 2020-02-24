@@ -69,16 +69,119 @@ void delete(Node** frontPtr) {
 	return;
 }
 
+//comparators return 1 if 2nd argument is larger, 0 otherwise
+//doesn't care about being equal
+int intComp(void * a, void * b) {
+	return *((int *) a) < *((int * ) b) ? 1 : 0;
+}
+
+int strComp(void * a, void * b) {
+	char * strA = (char *) a;
+	char * strB = (char *) b;
+	int i = 0;
+	int j = -1;
+
+	while (strA[i] != 0 && strB[i++] != 0) {}
+	while (j++ <= i) {
+		if (strA[j] != strB[j]) {
+			return strA[j] < strB[j] ? 1 : 0;
+		}
+	}
+	return 0;
+}
+
 int comparator(void* a, void* b) {
-	return 0;
+	if (atoi((char*)(a)) == 0 && ((char*)(a))[0] != '0') {
+		return strComp(a, b);
+	} else {
+		return intComp(a, b);
+	}
 }
 
-int insertionSort(void* toSort, int (*comparator)(void*, void*)) {
-	return 0;
+void * partition(void * head_in, void * end_in, int (*comparator)(void*, void*)) {
+	Node * head = (Node *) head_in;
+	Node * pvt = head;
+	Node * i = head;
+	Node * j;
+	Node tmp;
+	for (j = head; j != NULL; j = j->next) {
+		if (comparator((void *) &(j->data), (void *) &(pvt->data))) {
+			pvt = i == pvt ? j : pvt;
+			tmp = *j;
+			j->data = i->data;
+			i->data = tmp.data;
+			i = i->next;
+		}
+	}
+	tmp = *pvt;
+	pvt->data = i->data;
+	i->data = tmp.data;
+	return i;
 }
 
-int quickSort(void* toSort, int (*comparator)(void*, void*)) {
-	return 0;
+void * quickSortHelper(void * head_in, void * end_in, int (*comparator)(void*, void*)) {
+	Node * head = (Node *) head_in;
+	Node * end = (Node *) end_in;
+	if (head == NULL || head->next == NULL) {
+		return head;
+	}
+	Node * ptr = (Node *) partition(head, end, comparator);
+	Node * tmp = head;
+
+	if (tmp != ptr) { //need this check?
+		while (tmp->next != ptr) {
+			tmp = tmp->next;
+		}
+		tmp->next = NULL;
+		head = (Node *) quickSortHelper(head, tmp, comparator);
+		tmp = head;
+		while (tmp->next != NULL) {
+			tmp = tmp->next;
+		}
+		tmp->next = ptr;
+	}
+	ptr->next = (Node *) quickSortHelper(ptr->next, end, comparator);
+	return head;
+}
+
+
+int quickSort(void * head, int (*comparator)(void*, void*)) {
+	if (head == NULL) {
+		return -1;
+	}
+	Node * ptr = (Node *) head;
+	while (ptr->next != NULL) {
+		ptr = ptr->next;
+	}
+	quickSortHelper(head, ptr, comparator);
+	return 1;
+}
+
+int insertionSort(void * head, int (*comparator)(void *, void *)) {
+	Node * edge = (Node *) head;
+	Node * ptr = (Node *) head;
+	Node * tmp0;
+	Node tmp;
+	Node tmp2;
+	Node tmp3;
+	while (edge->next != NULL) {
+		ptr = head;
+		while (ptr != edge->next && !comparator((void*) &(edge->next->data), (void*) &(ptr->data))) {
+			ptr = ptr->next;
+		}
+		tmp0 = ptr;
+		tmp = *(edge->next);
+		tmp2 = *ptr;
+		while (ptr != edge->next) {
+			tmp3 = *(ptr->next);
+			ptr->next->data = tmp2.data;
+			tmp2 = tmp3;
+			ptr = ptr->next;
+		}
+		tmp0->data = tmp.data;
+		edge = edge->next;
+	}
+	return 1;
 }
 
 int main(int argc, char* argv[]) {
