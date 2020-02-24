@@ -39,7 +39,6 @@ int strComp(void * a, void * b) {
 
 void * partition(void * head_in, void * end_in, int (*comparator)(void*, void*)) {
   Node * head = (Node *) head_in;
-  Node * end = (Node *) end_in;
   Node * pvt = head;
   Node * i = head;
   Node * j;
@@ -100,7 +99,6 @@ int quickSort(void * head, int (*comparator)(void*, void*)) {
 int insertionSort(void * head, int (*comparator)(void *, void *)) {
   Node * edge = (Node *) head;
   Node * ptr = (Node *) head;
-  Node * copy = (Node *) head;
   Node * tmp0;
   Node tmp;
   Node tmp2;
@@ -128,7 +126,7 @@ int insertionSort(void * head, int (*comparator)(void *, void *)) {
 
 int main(int argc, char * argv[]) {
   int (*intCompare)(void*, void*) = intComp;
-  int (*strCompare)(void*, void*) = strComp;
+  //int (*strCompare)(void*, void*) = strComp;
   Node a1 = {8, NULL};
   Node b1 = {1, &a1};
   Node c1 = {1, &b1};

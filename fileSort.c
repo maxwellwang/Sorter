@@ -90,14 +90,6 @@ int strComp(void * a, void * b) {
 	return 0;
 }
 
-int comparator(void* a, void* b) {
-	if (atoi((char*)(a)) == 0 && ((char*)(a))[0] != '0') {
-		return strComp(a, b);
-	} else {
-		return intComp(a, b);
-	}
-}
-
 void * partition(void * head_in, void * end_in, int (*comparator)(void*, void*)) {
 	Node * head = (Node *) head_in;
 	Node * pvt = head;
@@ -223,8 +215,9 @@ int main(int argc, char* argv[]) {
 	char* nextBuffer;
 	// front of LL
 	Node* front = NULL;
-	// function pointer to be used in sort call
-	int (*compPtr)(void*, void*) = comparator;
+	// function pointers to be used in sort call
+	int (*intCompPtr)(void*, void*) = intComp;
+	int (*strCompPtr)(void*, void*) = strComp;
 	
 	
 	// read from file and make LL
@@ -277,10 +270,20 @@ int main(int argc, char* argv[]) {
 	}
 	
 	// call sorts here
+	char* a = front->data;
+	int isString = atoi(a) == 0 && a[0] != '0';
 	if (argv[1][1] == 'i') {
-		insertionSort(&front, compPtr);
+		if (isString) {
+			insertionSort(&front, strCompPtr);
+		} else {
+			insertionSort(&front, intCompPtr);
+		}
 	} else if (argv[1][1] == 'q') {
-		quickSort(&front, compPtr);
+		if (isString) {
+			quickSort(&front, strCompPtr);
+		} else {
+			quickSort(&front, intCompPtr);
+		}
 	}
 	
 	// print sorted LL
