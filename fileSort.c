@@ -76,7 +76,7 @@ int intComp(void * a, void * b) {
 }
 
 int strComp(void * a, void * b) {
-	char * strA = (char *) a;
+        char * strA = (char *) a;
 	char * strB = (char *) b;
 	int i = 0;
 	int j = -1;
@@ -97,7 +97,7 @@ void * partition(void * head_in, void * end_in, int (*comparator)(void*, void*))
 	Node * j;
 	Node tmp;
 	for (j = head; j != NULL; j = j->next) {
-		if (comparator((void *) &(j->data), (void *) &(pvt->data))) {
+		if (comparator((void *) (j->data), (void *) (pvt->data))) {
 			pvt = i == pvt ? j : pvt;
 			tmp = *j;
 			j->data = i->data;
@@ -158,7 +158,7 @@ int insertionSort(void * head, int (*comparator)(void *, void *)) {
 	Node tmp3;
 	while (edge->next != NULL) {
 		ptr = head;
-		while (ptr != edge->next && !comparator((void*) &(edge->next->data), (void*) &(ptr->data))) {
+		while (ptr != edge->next && !comparator((void*) (edge->next->data), (void*) (ptr->data))) {
 			ptr = ptr->next;
 		}
 		tmp0 = ptr;
@@ -270,19 +270,19 @@ int main(int argc, char* argv[]) {
 	}
 	
 	// call sorts here
-	char* a = front->data;
-	int isString = atoi(a) == 0 && a[0] != '0';
+	char a = (front->data)[0];
+	int isString = isalpha(a);
 	if (argv[1][1] == 'i') {
 		if (isString) {
-			insertionSort(&front, strCompPtr);
+		  insertionSort((void*)front, strCompPtr);
 		} else {
-			insertionSort(&front, intCompPtr);
+			insertionSort((void*)front, intCompPtr);
 		}
 	} else if (argv[1][1] == 'q') {
 		if (isString) {
-			quickSort(&front, strCompPtr);
+			quickSort((void*)front, strCompPtr);
 		} else {
-			quickSort(&front, intCompPtr);
+			quickSort((void*)front, intCompPtr);
 		}
 	}
 	
