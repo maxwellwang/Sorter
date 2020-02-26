@@ -224,7 +224,7 @@ int main(int argc, char* argv[]) {
 	// read from file and make LL
 	int newToken = 0;
 	while (read(fd, &c, 1) > 0) {
-		if (isalpha(c) || isdigit(c)) {
+		if (isalpha(c) || isdigit(c) || c == '-') {
 			// add to buffer and increment written
 			if (written == 0) {
 				newToken = 1;
