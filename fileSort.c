@@ -72,7 +72,7 @@ void delete(Node** frontPtr) {
 //comparators return 1 if 2nd argument is larger, 0 otherwise
 //doesn't care about being equal
 int intComp(void * a, void * b) {
-	return *((int *) a) < *((int * ) b) ? 1 : 0;
+  return atoi((char *) a) < atoi((char *) b);
 }
 
 int strComp(void * a, void * b) {
@@ -179,6 +179,7 @@ int insertionSort(void * head, int (*comparator)(void *, void *)) {
 int main(int argc, char* argv[]) {
 	// handle input errors and open file
 	if (argc != 3) {
+
 		printf("Fatal Error: Expected 2 arguments, had %d\n", argc - 1);
 		exit(0);
 	}
