@@ -28,11 +28,11 @@ void printLL(Node* front) {
 void insert(Node** frontPtr, char* data, int tokenLength) {
 	int j;
 	if (*frontPtr == NULL) {
-		*frontPtr = malloc(sizeof(Node));
+		*frontPtr = (Node*)malloc(sizeof(Node));
 		if (!(*frontPtr)) {
 			perror("Error");
 		}
-		(*frontPtr)->data = malloc(tokenLength);
+		(*frontPtr)->data = (char*)malloc(tokenLength);
 		if ((*frontPtr)->data == NULL) {
 			perror("Error");
 		}
@@ -41,11 +41,11 @@ void insert(Node** frontPtr, char* data, int tokenLength) {
 		}
 		(*frontPtr)->next = NULL;
 	} else {
-		Node* temp = malloc(sizeof(Node));
+		Node* temp = (Node*)malloc(sizeof(Node));
 		if (temp == NULL) {
 			perror("Error");
 		}
-		temp->data = malloc(tokenLength);
+		temp->data = (char*)malloc(tokenLength);
 		if (temp->data == NULL) {
 			perror("Error");
 		}
@@ -198,7 +198,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	// buffer to hold each token, doubles every time limit is reached
-	char* buffer = malloc(10);
+	char* buffer = (char*)malloc(10);
 	if (buffer == NULL) {
 		perror("Error");
 	}
@@ -242,7 +242,7 @@ int main(int argc, char* argv[]) {
 		
 		if (head + 1 == buffer + size) {
 			// reached end of buffer, realloc with double size
-			nextBuffer = malloc(2 * size);
+			nextBuffer = (char*)malloc(2 * size);
 			size *= 2;
 			if (nextBuffer == NULL) {
 				perror("Error");
