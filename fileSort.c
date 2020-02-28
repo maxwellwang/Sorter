@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
 #define DEBUG 0
 
 // Node has strings containing token and pointer to next Node
@@ -223,7 +224,13 @@ int main(int argc, char* argv[]) {
 	
 	// read from file and make LL
 	int newToken = 0;
-	while (read(fd, &c, 1) > 0) {
+	int status = read(fd, &c, 1);
+	while (status) {
+		if (status == -1 && errno == EINTR) {
+			// signal interrupted resulting in 0 bytes read before EOF, try again
+			status = read(fd, &c, 1);
+			continue;
+		}
 		if (isalpha(c) || isdigit(c) || c == '-') {
 			// add to buffer and increment written
 			if (written == 0) {
@@ -253,6 +260,7 @@ int main(int argc, char* argv[]) {
 		}
 		
 		head = buffer + written;
+		status = read(fd, &c, 1);
 	}
 	if (newToken) {
 		// insert one more token
@@ -260,8 +268,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	// close file
-	int status = close(fd);
-	if (status == -1) {
+	if (close(fd) == -1) {
 		perror("Error");
 	}
 	
