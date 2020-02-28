@@ -16,10 +16,14 @@ typedef struct Node {
 } Node;
 
 // prints LL contents
-void printLL(Node* front) {
+void printLL(Node* front, int intMode) {
 	Node* ptr = front;
 	while (ptr != NULL) {
-		printf("%s\n", ptr->data);
+		if (intMode && strlen(ptr->data) == 0) {
+			printf("0\n");
+		} else {
+			printf("%s\n", ptr->data);
+		}
 		ptr = ptr->next;
 	}
 	return;
@@ -225,6 +229,7 @@ int main(int argc, char* argv[]) {
 	// read from file and make LL
 	int newToken = 0;
 	int status = read(fd, &c, 1);
+	int intMode = 0; // assume strings for now
 	while (status) {
 		if (status == -1 && errno == EINTR) {
 			// signal interrupted resulting in 0 bytes read before EOF, try again
@@ -232,6 +237,10 @@ int main(int argc, char* argv[]) {
 			continue;
 		}
 		if (isalpha(c) || isdigit(c) || c == '-') {
+			// set intMode if int
+			if (isdigit(c)) {
+				intMode = 1;
+			}
 			// add to buffer and increment written
 			if (written == 0) {
 				newToken = 1;
@@ -295,7 +304,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	// print sorted LL
-	printLL(front);
+	printLL(front, intMode);
 	
 	// free all allocated memory
 	free(buffer);
