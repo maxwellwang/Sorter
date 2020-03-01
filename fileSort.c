@@ -236,13 +236,13 @@ int main(int argc, char* argv[]) {
 	int status = read(fd, &c, 1);
 	int intMode = 0; // assume strings for now
 	while (status) {
-		empty = 0;
 		if (status == -1 && errno == EINTR) {
 			// signal interrupted resulting in 0 bytes read before EOF, try again
 			status = read(fd, &c, 1);
 			continue;
 		}
 		if (isalpha(c) || isdigit(c) || c == '-') {
+			empty = 0;
 			// set intMode if int
 			if (isdigit(c)) {
 				intMode = 1;
@@ -256,6 +256,7 @@ int main(int argc, char* argv[]) {
 			tokenLength++;
 		} else if (c == ',') {
 			// token complete, insert into LL
+			empty = 0;
 			written = 0;
 			insert(&front, buffer, tokenLength);
 			tokenLength = 0;
