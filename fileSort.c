@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
-#include <errno.h>
 #define DEBUG 0
 
 // Node has strings containing token and pointer to next Node
@@ -16,14 +15,10 @@ typedef struct Node {
 } Node;
 
 // prints LL contents
-void printLL(Node* front, int intMode) {
+void printLL(Node* front) {
 	Node* ptr = front;
 	while (ptr != NULL) {
-		if (intMode && strlen(ptr->data) == 0) {
-			printf("0\n");
-		} else {
-			printf("%s\n", ptr->data);
-		}
+		printf("%s\n", ptr->data);
 		ptr = ptr->next;
 	}
 	return;
@@ -33,7 +28,7 @@ void printLL(Node* front, int intMode) {
 void insert(Node** frontPtr, char* data, int tokenLength) {
 	int j;
 	if (*frontPtr == NULL) {
-		*frontPtr = (Node*)malloc(sizeof(Node));
+		*frontPtr = malloc(sizeof(Node));
 		if (!(*frontPtr)) {
 			perror("Error");
 		}
@@ -46,7 +41,7 @@ void insert(Node** frontPtr, char* data, int tokenLength) {
 		}
 		(*frontPtr)->next = NULL;
 	} else {
-		Node* temp = (Node*)malloc(sizeof(Node));
+		Node* temp = malloc(sizeof(Node));
 		if (temp == NULL) {
 			perror("Error");
 		}
@@ -65,11 +60,12 @@ void insert(Node** frontPtr, char* data, int tokenLength) {
 
 // delete front and free allocated memory
 void delete(Node** frontPtr) {
-	if (*(frontPtr) != NULL) {
-		Node* temp = *frontPtr;
-		free((*frontPtr)->data);
-		*frontPtr = (*frontPtr)->next;
-		free(temp);
+        Node * temp = *frontPtr;
+	while ((*frontPtr) != NULL) {
+	  temp = (*frontPtr)->next;
+	  free((*frontPtr)->data);
+	  free((*frontPtr));
+	  *frontPtr = temp;
 	}
 	return;
 }
@@ -121,6 +117,7 @@ void * partition(void * head_in, int (*comparator)(void*, void*)) {
 	i->data = tmp.data;
 	return i;
 }
+
 void * quickSortHelper(void * head_in, int (*comparator)(void*, void*)) {
 	Node * head = (Node *) head_in;
 	if (head == NULL || head->next == NULL) {
@@ -177,6 +174,7 @@ int insertionSort(void * head, int (*comparator)(void *, void *)) {
 		}
 		tmp0->data = tmp.data;
 		edge = edge->next;
+				
 	}
 	return 1;
 }
@@ -184,7 +182,6 @@ int insertionSort(void * head, int (*comparator)(void *, void *)) {
 int main(int argc, char* argv[]) {
 	// handle input errors and open file
 	if (argc != 3) {
-
 		printf("Fatal Error: Expected 2 arguments, had %d\n", argc - 1);
 		exit(0);
 	}
@@ -203,7 +200,8 @@ int main(int argc, char* argv[]) {
 	}
 	
 	// buffer to hold each token, doubles every time limit is reached
-	char* buffer = (char*)malloc(10);
+	char* buffer = malloc(10);
+	memset(buffer, 0, 10);
 	if (buffer == NULL) {
 		perror("Error");
 	}
@@ -256,8 +254,7 @@ int main(int argc, char* argv[]) {
 			insert(&front, buffer, tokenLength);
 			tokenLength = 0;
 			newToken = 0;
-		}
-		
+		}		
 		if (head + 2 == buffer + size) {
 			// reached end of buffer, realloc with double size
 			nextBuffer = (char*)malloc(2 * size);
@@ -269,9 +266,8 @@ int main(int argc, char* argv[]) {
 			size *= 2;			
 			buffer = nextBuffer;
 		}
-		
+
 		head = buffer + written;
-		status = read(fd, &c, 1);
 	}
 	if (newToken) {
 		// insert one more token
@@ -279,7 +275,8 @@ int main(int argc, char* argv[]) {
 	}
 	
 	// close file
-	if (close(fd) == -1) {
+	int status = close(fd);
+	if (status == -1) {
 		perror("Error");
 	}
 	
@@ -295,6 +292,12 @@ int main(int argc, char* argv[]) {
 	}
 
 	// call sorts here
+	if (empty == 1) {
+	        printf("Warning: empty file!\n");
+		free(buffer);
+		return 0;
+	}
+
 	char a = (front->data)[0];
 	int isString = isalpha(a);
 	if (argv[1][1] == 'i') {
@@ -310,9 +313,8 @@ int main(int argc, char* argv[]) {
 			quickSort((void*)front, intCompPtr);
 		}
 	}
-	
 	// print sorted LL
-	printLL(front, intMode);
+	printLL(front);
 	
 	// free all allocated memory
 	free(buffer);
