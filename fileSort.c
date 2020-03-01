@@ -32,8 +32,7 @@ void insert(Node** frontPtr, char* data, int tokenLength) {
 		if (!(*frontPtr)) {
 			perror("Error");
 		}
-		(*frontPtr)->data = malloc(tokenLength+1);
-		memset((*frontPtr)->data, 0, tokenLength+1);
+		(*frontPtr)->data = (char*)malloc(tokenLength+1);
 		if ((*frontPtr)->data == NULL) {
 			perror("Error");
 		}
@@ -46,8 +45,7 @@ void insert(Node** frontPtr, char* data, int tokenLength) {
 		if (temp == NULL) {
 			perror("Error");
 		}
-		temp->data = malloc(tokenLength+1);
-		memset((temp->data), 0, tokenLength+1);
+		temp->data = (char*)malloc(tokenLength+1);
 		if (temp->data == NULL) {
 			perror("Error");
 		}
@@ -149,10 +147,6 @@ int quickSort(void * head, int (*comparator)(void*, void*)) {
 	if (head == NULL) {
 		return -1;
 	}
-	Node * ptr = (Node *) head;
-	while (ptr->next != NULL) {
-		ptr = ptr->next;
-	}
 	quickSortHelper(head, comparator);
 	return 1;
 }
@@ -233,9 +227,20 @@ int main(int argc, char* argv[]) {
 	// read from file and make LL
 	int newToken = 0;
 	int empty = 1;
-	while (read(fd, &c, 1) > 0) {
-		empty = 0;
-		if (isalpha(c) || isdigit(c)) {
+	int status = read(fd, &c, 1);
+	int intMode = 0; // assume strings for now
+	while (status) {
+	  empty = 0;
+		if (status == -1 && errno == EINTR) {
+			// signal interrupted resulting in 0 bytes read before EOF, try again
+			status = read(fd, &c, 1);
+			continue;
+		}
+		if (isalpha(c) || isdigit(c) || c == '-') {
+			// set intMode if int
+			if (isdigit(c)) {
+				intMode = 1;
+			}
 			// add to buffer and increment written
 			if (written == 0) {
 				newToken = 1;
@@ -249,18 +254,16 @@ int main(int argc, char* argv[]) {
 			insert(&front, buffer, tokenLength);
 			tokenLength = 0;
 			newToken = 0;
-		}
-
+		}		
 		if (head + 2 == buffer + size) {
 			// reached end of buffer, realloc with double size
-			nextBuffer = malloc(2 * size);
+			nextBuffer = (char*)malloc(2 * size);
 			if (nextBuffer == NULL) {
 				perror("Error");
 			}
-			memset(nextBuffer, 0, 2*size);
 			memcpy(nextBuffer, buffer, size-1);
-			size *= 2;
 			free(buffer);
+			size *= 2;			
 			buffer = nextBuffer;
 		}
 
@@ -281,7 +284,13 @@ int main(int argc, char* argv[]) {
 	if (c == '\n' && front == NULL) {
 		printf("Warning: File is empty\n");
 	}
-	
+
+	if (empty == 1) {
+	  printf("Warning: empty file!\n");
+	  free(buffer);
+	  return 0;
+	}
+
 	// call sorts here
 	if (empty == 1) {
 	        printf("Warning: empty file!\n");
