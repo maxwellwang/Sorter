@@ -16,10 +16,14 @@ typedef struct Node {
 } Node;
 
 // prints LL contents
-void printLL(Node* front) {
+void printLL(Node* front, int intMode) {
 	Node* ptr = front;
 	while (ptr != NULL) {
-		printf("%s\n", ptr->data);
+		if (strlen(ptr->data) == 0 && intMode) {
+			printf("0\n");
+		} else {
+			printf("%s\n", ptr->data);
+		}
 		ptr = ptr->next;
 	}
 	return;
@@ -307,7 +311,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	// print sorted LL
-	printLL(front);
+	printLL(front, intMode);
 	
 	// free all allocated memory
 	free(buffer);
