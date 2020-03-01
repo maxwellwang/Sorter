@@ -236,7 +236,7 @@ int main(int argc, char* argv[]) {
 	int status = read(fd, &c, 1);
 	int intMode = 0; // assume strings for now
 	while (status) {
-	  empty = 0;
+		empty = 0;
 		if (status == -1 && errno == EINTR) {
 			// signal interrupted resulting in 0 bytes read before EOF, try again
 			status = read(fd, &c, 1);
