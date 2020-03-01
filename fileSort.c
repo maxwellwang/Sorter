@@ -284,23 +284,13 @@ int main(int argc, char* argv[]) {
 	}
 	
 	// handle file content warnings
-	if (c == '\n' && front == NULL) {
-		printf("Warning: File is empty\n");
-	}
 
-	if (empty == 1) {
-	  printf("Warning: empty file!\n");
-	  free(buffer);
-	  return 0;
-	}
-
-	// call sorts here
 	if (empty == 1) {
 	        printf("Warning: empty file!\n");
 		free(buffer);
 		return 0;
 	}
-
+	// call sorts here
 	char a = (front->data)[0];
 	int isString = isalpha(a);
 	if (argv[1][1] == 'i') {
