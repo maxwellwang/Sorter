@@ -1,7 +1,23 @@
-a document detailing how you tested your code - what tests did you do and, in a sentence (or two), what were you testing for
-TESTS
-	Input tests to make sure fatal errors occurred if input was invalid.
-	Changed 'somefile' contents to strings or integers with varying whitespace
+We tested the following to catch human error:
+Incorrect number of arguments or wrong arguments (invalid filename/invalid sort) to ensure that the correct errors would be thrown and the program would terminate. 
+All types of whitespaces (space, \t, \n, \r, etc) in all places: before tokens, inside tokens, after tokens. For example, a single token could be split over several newlines and spaces.
 
-TESTING FOR
-	We tested for
+We tested the following to catch system IO errors:
+A very large file to ensure the IO loop reads the entire file without fail.
+A very large file to ensure if read() splits a token, we still parse it correctly.
+Files with back to back delimiters (so two commas) to ensure we parse it correctly as a valid token
+
+We tested the following (independently) to test the comparator functions:
+For strings, empty strings, identical strings, a string and a substring of that string, different strings
+For integers: zero, negative numbers, the same number, numbers of opposite magnitude, different numbers, randomly chosen numbers
+
+We tested the following to verify the sorting functions:
+Duplicate/n-plicates, lists in sorted order, sorted order but reversed, randomly generated lists, etc.
+Very small lists with less than 5 items to ensure edge cases worked properly.
+Compared by sight but also ran quicksort and insertion sort against each other to verify for larger files.
+
+We tested the following to verify integration of sorting, comparator, and IO:
+Python script to randomly populate and generate test files, which then calls our program and compares the output.
+
+We tested the following to verify we free()’d everything:
+Using Valgrind.

@@ -254,10 +254,10 @@ int main(int argc, char* argv[]) {
 		if (head + 2 == buffer + size) {
 			// reached end of buffer, realloc with double size
 			nextBuffer = malloc(2 * size);
-			memset(nextBuffer, 0, 2*size);
 			if (nextBuffer == NULL) {
 				perror("Error");
 			}
+			memset(nextBuffer, 0, 2*size);
 			memcpy(nextBuffer, buffer, size-1);
 			size *= 2;
 			free(buffer);
