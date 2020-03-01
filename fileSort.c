@@ -37,7 +37,7 @@ void insert(Node** frontPtr, char* data, int tokenLength) {
 		if (!(*frontPtr)) {
 			perror("Error");
 		}
-		(*frontPtr)->data = (char*)malloc(tokenLength);
+		(*frontPtr)->data = (char*)malloc(tokenLength+1);
 		if ((*frontPtr)->data == NULL) {
 			perror("Error");
 		}
@@ -50,7 +50,7 @@ void insert(Node** frontPtr, char* data, int tokenLength) {
 		if (temp == NULL) {
 			perror("Error");
 		}
-		temp->data = (char*)malloc(tokenLength);
+		temp->data = (char*)malloc(tokenLength+1);
 		if (temp->data == NULL) {
 			perror("Error");
 		}
@@ -81,21 +81,27 @@ int intComp(void * a, void * b) {
 }
 
 int strComp(void * a, void * b) {
-        char * strA = (char *) a;
-	char * strB = (char *) b;
+	char * strA = malloc(strlen((char*)a) + 2);
+	char * strB = malloc(strlen((char*)b) + 2);
+	memset(strA, 0, strlen((char*)a)+2);
+	memset(strB, 0, strlen((char*)b)+2);
+	memcpy(strA, (char*)a, strlen((char*)a));
+	memcpy(strB, (char*)b, strlen((char*)b));
+	
 	int i = 0;
 	int j = -1;
-
 	while (strA[i] != 0 && strB[i++] != 0) {}
 	while (j++ <= i) {
 		if (strA[j] != strB[j]) {
 			return strA[j] < strB[j] ? 1 : 0;
 		}
 	}
+	free(strA);
+	free(strB);
 	return 0;
 }
 
-void * partition(void * head_in, void * end_in, int (*comparator)(void*, void*)) {
+void * partition(void * head_in, int (*comparator)(void*, void*)) {
 	Node * head = (Node *) head_in;
 	Node * pvt = head;
 	Node * i = head;
@@ -115,14 +121,12 @@ void * partition(void * head_in, void * end_in, int (*comparator)(void*, void*))
 	i->data = tmp.data;
 	return i;
 }
-
-void * quickSortHelper(void * head_in, void * end_in, int (*comparator)(void*, void*)) {
+void * quickSortHelper(void * head_in, int (*comparator)(void*, void*)) {
 	Node * head = (Node *) head_in;
-	Node * end = (Node *) end_in;
 	if (head == NULL || head->next == NULL) {
 		return head;
 	}
-	Node * ptr = (Node *) partition(head, end, comparator);
+	Node * ptr = (Node *) partition(head, comparator);
 	Node * tmp = head;
 
 	if (tmp != ptr) { //need this check?
@@ -130,14 +134,14 @@ void * quickSortHelper(void * head_in, void * end_in, int (*comparator)(void*, v
 			tmp = tmp->next;
 		}
 		tmp->next = NULL;
-		head = (Node *) quickSortHelper(head, tmp, comparator);
+		head = (Node *) quickSortHelper(head, comparator);
 		tmp = head;
 		while (tmp->next != NULL) {
 			tmp = tmp->next;
 		}
 		tmp->next = ptr;
 	}
-	ptr->next = (Node *) quickSortHelper(ptr->next, end, comparator);
+	ptr->next = (Node *) quickSortHelper(ptr->next, comparator);
 	return head;
 }
 
@@ -146,11 +150,7 @@ int quickSort(void * head, int (*comparator)(void*, void*)) {
 	if (head == NULL) {
 		return -1;
 	}
-	Node * ptr = (Node *) head;
-	while (ptr->next != NULL) {
-		ptr = ptr->next;
-	}
-	quickSortHelper(head, ptr, comparator);
+	quickSortHelper(head, comparator);
 	return 1;
 }
 
@@ -228,9 +228,11 @@ int main(int argc, char* argv[]) {
 	
 	// read from file and make LL
 	int newToken = 0;
+	int empty = 1;
 	int status = read(fd, &c, 1);
 	int intMode = 0; // assume strings for now
 	while (status) {
+	  empty = 0;
 		if (status == -1 && errno == EINTR) {
 			// signal interrupted resulting in 0 bytes read before EOF, try again
 			status = read(fd, &c, 1);
@@ -256,15 +258,15 @@ int main(int argc, char* argv[]) {
 			newToken = 0;
 		}
 		
-		if (head + 1 == buffer + size) {
+		if (head + 2 == buffer + size) {
 			// reached end of buffer, realloc with double size
 			nextBuffer = (char*)malloc(2 * size);
-			size *= 2;
 			if (nextBuffer == NULL) {
 				perror("Error");
 			}
-			memcpy(nextBuffer, buffer, strlen(buffer));
+			memcpy(nextBuffer, buffer, size-1);
 			free(buffer);
+			size *= 2;			
 			buffer = nextBuffer;
 		}
 		
@@ -285,7 +287,13 @@ int main(int argc, char* argv[]) {
 	if (c == '\n' && front == NULL) {
 		printf("Warning: File is empty\n");
 	}
-	
+
+	if (empty == 1) {
+	  printf("Warning: empty file!\n");
+	  free(buffer);
+	  return 0;
+	}
+
 	// call sorts here
 	char a = (front->data)[0];
 	int isString = isalpha(a);
