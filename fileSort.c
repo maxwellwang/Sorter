@@ -235,7 +235,7 @@ int main(int argc, char* argv[]) {
 	int empty = 1;
 	int status = read(fd, &c, 1);
 	int intMode = 0; // assume strings for now
-	while (status>0) {
+	while (status) {
 	  empty = 0;
 		if (status == -1 && errno == EINTR) {
 			// signal interrupted resulting in 0 bytes read before EOF, try again
@@ -290,7 +290,7 @@ int main(int argc, char* argv[]) {
 	// handle file content warnings
 
 	if (empty == 1) {
-	        printf("Warning: empty file!\n");
+		printf("Warning: empty file!\n");
 		free(buffer);
 		return 0;
 	}
